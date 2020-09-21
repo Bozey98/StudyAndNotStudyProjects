@@ -41,7 +41,7 @@ struct PageView: View {
 struct ReviewImage: View {
     var image: Image?
     
-    @State private var dragOffset: CGSize = .zero
+    @State private var dragOffset: CGFloat = .zero
     @State var showBackground: Bool = true
     
     @EnvironmentObject var previewHider: PreviewHider
@@ -51,49 +51,47 @@ struct ReviewImage: View {
             Color.black
                 .edgesIgnoringSafeArea(.all)
                 .opacity(previewHider.showBackground ? 1 : 0)
+            //Color.black
             image?
                 .resizable()
                 .scaledToFit()
-                .offset(dragOffset)
+                .offset(y: dragOffset)
                 
-                
-        }
-        .allowsHitTesting(previewHider.transitionPermission)
-//        .gesture(
-//            DragGesture()
-//                .onChanged { drag in
-//                    print(drag.translation.height)
-//                    withAnimation(Animation.linear(duration: 0.1)) {
-//                        self.dragOffset.height = drag.translation.height
-//                        
-//                    }
-//                    
-//                    withAnimation {
-//                        previewHider.showBackground = false
-//                    }
-//                    
-//                }
-//                .onEnded { drag in
-//                    self.previewHider.transitionPermission = false
-//                    if abs(self.dragOffset.height) > UIScreen.main.bounds.height / 5 {
-//                        withAnimation {
-//                            self.previewHider.showReviewView = false
-//                            self.previewHider.transitionWay = drag.translation.height
-//                            print(drag.translation.height)
-//                        }
-//                    } else {
-//                        withAnimation {
-//                            self.dragOffset = .zero
-//                            self.previewHider.showBackground = true
-//                        }
-//                    }
-//                    
-//                    
-//                    
-//                    
-//                }
-//            )
-        
+        }.gesture(
+            DragGesture()
+                .onChanged { drag in
+                    
+                    
+                    withAnimation(Animation.linear(duration: 0.1)) {
+                        self.dragOffset = drag.translation.height
+                    }
+                    
+                    
+                    withAnimation {
+                        previewHider.showBackground = false
+                    }
+                    
+                }
+                .onEnded { drag in
+                    
+                    if abs(drag.translation.height) > UIScreen.main.bounds.height / 5 {
+                        withAnimation {
+                            self.previewHider.showReviewView = false
+                            self.previewHider.transitionWay = drag.translation.height
+                            print(drag.translation.height)
+                        }
+                    } else {
+                        withAnimation {
+                            self.dragOffset = .zero
+                            self.previewHider.showBackground = true
+                        }
+                    }
+                    
+                    
+                    
+                    
+                }
+            )
     }
 }
 
@@ -102,7 +100,6 @@ class PreviewHider: ObservableObject {
     @Published var showReviewView = false
     @Published var showBackground = true
     @Published var transitionWay: CGFloat = .zero
-    @Published var transitionPermission = false
     
     func repickImage() {
         self.showBackground = true
